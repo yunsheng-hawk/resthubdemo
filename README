@@ -1,0 +1,35 @@
+整个demo参照http://resthub.org/tutorial/spring.html的说明进行，但其中有若干步骤需要修正（tutorial说明与实际不符）
+1. Step 3: 
+findByName需要修改为findByTitle，因为Step 2中已经将属性name改为title了，这里也得相应修改
+同理，其他的凡是用到name的都需要改为title
+
+2. Step 3：
+TaskControllerTest类的rootUrl()方法不再需要，改为构造方法中调用父类的初始化profile动作
+public TaskControllerTest() {
+	super("resthub-web-server,resthub-jpa");
+}
+
+另外，需要修改pom文件，添加一个plugin
+<plugin>
+	<groupId>org.apache.maven.plugins</groupId>
+	<artifactId>maven-plugin-plugin</artifactId>
+	<version>3.0</version>
+	<executions>
+	</executions>
+	<configuration>
+		<!-- Needed for Java 5 annotation based configuration, for some reason. -->
+		<skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
+	</configuration>
+</plugin>
+
+同时，测试方法中的/name也需要改为/title
+
+最后，mvn -Dtest=TaskControllerTest#testCreateResource test中的testCreateResource应该是方法名，显然并不存在。
+可修改为正确的方法名，或干脆去掉#xxxx，这样就可以直接测试整个测试类
+
+3. 默认的，surefire plugin执行测试使用的是testNG而不是JUnit,因此写测试类的时候@Test需要导入正确的包，否则该annotation不会被识别
+
+4. Step 4, affectTask逻辑貌似不正确，需要自己重新实现，另外，好些方法声明前后不一致，需要仔细审阅
+
+5. testNG可以安装eclipse plugin，这样不必命令行运行，且支持调试。（当然也可以配置Java Remote来调试，不仅mvn test，也可以配置支持mvn jetty:run的调试）
+
